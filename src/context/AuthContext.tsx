@@ -139,20 +139,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      const profile: UserProfile = {
+      const profileData: Record<string, any> = {
         id: cred.user.uid,
         email,
         displayName,
         role: userRole,
-        linkedTeacherId: userRole === "TEACHER" ? linkedId : undefined,
-        linkedGroupId: userRole === "STUDENT" ? linkedId : undefined,
         isActive: true,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
 
-      await setDoc(doc(db, "users", cred.user.uid), profile);
-      setUserProfile(profile);
+      if (userRole === "TEACHER" && linkedId) {
+        profileData.linkedTeacherId = linkedId;
+      }
+      if (userRole === "STUDENT" && linkedId) {
+        profileData.linkedGroupId = linkedId;
+      }
+
+      // Ensure no undefined values are sent to Firestore
+      const cleanProfile = Object.fromEntries(
+        Object.entries(profileData).filter(([_, v]) => v !== undefined)
+      );
+
+      await setDoc(doc(db, "users", cred.user.uid), cleanProfile);
+      setUserProfile(cleanProfile as UserProfile);
       setRole(userRole);
       localStorage.setItem("learning_table_role", userRole);
       window.dispatchEvent(new Event("roleChanged"));

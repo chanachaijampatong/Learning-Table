@@ -51,15 +51,15 @@ export default function DashboardPage() {
   // Authentication Guard:
   // When visiting localhost:3000 directly, redirect to /login immediately if not authenticated
   useEffect(() => {
-    if (!authLoading) {
-      const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
-      const isAuthenticated = Boolean(currentUser) || hasLocalRole;
+    const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
+    const isAuthenticated = Boolean(currentUser) || hasLocalRole;
 
-      if (!isAuthenticated) {
-        router.replace("/login");
-        return;
-      }
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
 
+    if (!authLoading && isAuthenticated) {
       // If logged in as student or teacher, navigate to their dedicated view
       const activeRole = userProfile?.role || role;
       if (activeRole === "STUDENT") {
@@ -109,11 +109,15 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchStats();
-    const handleSeeded = () => fetchStats();
-    window.addEventListener("dataSeeded", handleSeeded);
-    return () => window.removeEventListener("dataSeeded", handleSeeded);
-  }, []);
+    const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
+    const isAuth = Boolean(currentUser) || hasLocalRole;
+    if (isAuth) {
+      fetchStats();
+      const handleSeeded = () => fetchStats();
+      window.addEventListener("dataSeeded", handleSeeded);
+      return () => window.removeEventListener("dataSeeded", handleSeeded);
+    }
+  }, [currentUser]);
 
   // If checking authentication or unauthenticated, show elegant loading screen without dashboard flicker
   const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
@@ -121,9 +125,21 @@ export default function DashboardPage() {
 
   if (authLoading || !isAuth) {
     return (
-      <div className="w-full min-h-[70vh] flex flex-col items-center justify-center space-y-3">
-        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-medium text-slate-500">กำลังเข้าสู่หน้าเข้าสู่ระบบ...</p>
+      <div className="w-full min-h-[70vh] flex flex-col items-center justify-center space-y-4 p-4">
+        <div className="w-9 h-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="text-center space-y-1">
+          <p className="text-sm font-semibold text-slate-700">กำลังเข้าสู่หน้าเข้าสู่ระบบ...</p>
+          <p className="text-xs text-slate-400">กรุณารอสักครู่ ระบบกำลังนำทางท่านอัตโนมัติ</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined") window.location.href = "/login";
+          }}
+          className="text-xs text-blue-600 hover:text-blue-800 underline font-medium cursor-pointer"
+        >
+          คลิกที่นี่หากหน้าจอไม่เปลี่ยนอัตโนมัติ
+        </button>
       </div>
     );
   }

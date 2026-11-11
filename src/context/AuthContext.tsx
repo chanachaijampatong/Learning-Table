@@ -109,7 +109,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const savedRole = localStorage.getItem("learning_table_role") as UserRole;
     if (savedRole) setRole(savedRole);
 
+    // Safety timeout: Never let initial auth checking hang more than 700ms
+    const authTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 700);
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      clearTimeout(authTimeout);
       setCurrentUser(user);
       if (user) {
         try {
@@ -142,7 +148,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(authTimeout);
+      unsubscribe();
+    };
   }, []);
 
   // Standard Login

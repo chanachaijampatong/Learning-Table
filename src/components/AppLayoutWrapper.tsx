@@ -21,15 +21,18 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
 
   // Global Route Guard: If not on an auth page and not authenticated, redirect to /login
   useEffect(() => {
-    if (!isAuthPage && !authLoading) {
-      const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
-      const isAuthenticated = Boolean(currentUser) || hasLocalRole;
+    if (isAuthPage) return;
 
-      if (!isAuthenticated) {
-        router.replace("/login");
-        return;
-      }
+    const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
+    const isAuthenticated = Boolean(currentUser) || hasLocalRole;
 
+    // Fast redirect if unauthenticated
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
+
+    if (!authLoading && isAuthenticated) {
       // Role permission guard: Students cannot access management or scheduler
       const activeRole = userProfile?.role || role;
       if (activeRole === "STUDENT" && (pathname === "/management" || pathname === "/scheduler")) {
@@ -54,9 +57,21 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
 
   if (authLoading || !isAuth) {
     return (
-      <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center space-y-3">
-        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-medium text-slate-500">กำลังตรวจสอบสิทธิ์การเข้าใช้งาน...</p>
+      <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center space-y-4 p-4">
+        <div className="w-9 h-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="text-center space-y-1">
+          <p className="text-sm font-semibold text-slate-700">กำลังตรวจสอบสิทธิ์การเข้าใช้งาน...</p>
+          <p className="text-xs text-slate-400">ระบบกำลังนำทางไปยังหน้าเข้าสู่ระบบ</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined") window.location.href = "/login";
+          }}
+          className="text-xs text-blue-600 hover:text-blue-800 underline font-medium cursor-pointer"
+        >
+          คลิกที่นี่หากหน้าจอไม่เปลี่ยนอัตโนมัติ
+        </button>
       </div>
     );
   }

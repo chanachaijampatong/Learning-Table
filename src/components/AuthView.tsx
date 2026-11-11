@@ -727,3 +727,4 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
     </div>
   );
 }
+

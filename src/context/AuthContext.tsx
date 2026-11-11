@@ -16,6 +16,41 @@ import {
 import { auth, db } from "@/lib/firebase/config";
 import { UserProfile, UserRole } from "@/types/database";
 
+// Format friendly Thai error messages from Firebase Auth / Firestore
+function formatAuthError(err: any): string {
+  if (!err) return "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+  const code = err.code || "";
+  const msg = err.message || "";
+
+  if (code === "auth/email-already-in-use" || msg.includes("email-already-in-use")) {
+    return "อีเมลนี้มีอยู่ในระบบแล้ว (หากคุณเคยสมัครแล้ว สามารถสลับไปที่แท็บ 'เข้าสู่ระบบ' ได้ทันที)";
+  }
+  if (code === "auth/invalid-email" || msg.includes("invalid-email")) {
+    return "รูปแบบอีเมลไม่ถูกต้อง กรุณาตรวจสอบอีเมลอีกครั้ง";
+  }
+  if (code === "auth/weak-password" || msg.includes("weak-password")) {
+    return "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
+  }
+  if (code === "auth/user-not-found" || msg.includes("user-not-found")) {
+    return "ไม่พบบัญชีผู้ใช้งานนี้ กรุณาตรวจสอบอีเมลหรือสมัครสมาชิกใหม่";
+  }
+  if (
+    code === "auth/wrong-password" || 
+    code === "auth/invalid-credential" || 
+    msg.includes("wrong-password") || 
+    msg.includes("invalid-credential")
+  ) {
+    return "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง";
+  }
+  if (code === "auth/network-request-failed" || msg.includes("network")) {
+    return "ไม่สามารถเชื่อมต่อระบบเครือข่ายได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต";
+  }
+  if (code === "permission-denied" || msg.includes("permission-denied")) {
+    return "ไม่มีสิทธิ์เข้าถึงฐานข้อมูล Firestore กรุณาตรวจสอบ Security Rules";
+  }
+  return msg || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+}
+
 // Predefined Demo Accounts
 export const DEMO_ACCOUNTS = {
   admin: {
@@ -120,12 +155,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUserProfile(prof);
         setRole(prof.role);
         localStorage.setItem("learning_table_role", prof.role);
+      } else {
+        // Document was missing, recreate profile seamlessly
+        const savedRole = (localStorage.getItem("learning_table_role") as UserRole) || "ADMIN";
+        const fallbackProfile: UserProfile = {
+          id: cred.user.uid,
+          email: cred.user.email || email,
+          displayName: cred.user.displayName || email.split("@")[0] || "ผู้ใช้งาน",
+          role: savedRole,
+          isActive: true,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        await setDoc(doc(db, "users", cred.user.uid), fallbackProfile, { merge: true });
+        setUserProfile(fallbackProfile);
+        setRole(savedRole);
       }
       window.dispatchEvent(new Event("roleChanged"));
       return { success: true };
     } catch (err: any) {
       console.error(err);
-      return { success: false, error: err.message || "อีเมลหรือรหัสผ่านไม่ถูกต้อง" };
+      return { success: false, error: formatAuthError(err) };
     }
   };
 
@@ -161,7 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         Object.entries(profileData).filter(([_, v]) => v !== undefined)
       );
 
-      await setDoc(doc(db, "users", cred.user.uid), cleanProfile);
+      await setDoc(doc(db, "users", cred.user.uid), cleanProfile, { merge: true });
       setUserProfile(cleanProfile as UserProfile);
       setRole(userRole);
       localStorage.setItem("learning_table_role", userRole);
@@ -169,7 +219,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: true };
     } catch (err: any) {
       console.error(err);
-      return { success: false, error: err.message || "เกิดข้อผิดพลาดในการลงทะเบียน" };
+
+      // Self-healing: If user was already created in Auth (e.g. from previous failed Firestore write),
+      // sign in automatically and write the missing Firestore document!
+      if (err.code === "auth/email-already-in-use" || err.message?.includes("email-already-in-use")) {
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, pass);
+          const profileData: Record<string, any> = {
+            id: cred.user.uid,
+            email,
+            displayName,
+            role: userRole,
+            isActive: true,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          };
+
+          if (userRole === "TEACHER" && linkedId) profileData.linkedTeacherId = linkedId;
+          if (userRole === "STUDENT" && linkedId) profileData.linkedGroupId = linkedId;
+
+          const cleanProfile = Object.fromEntries(
+            Object.entries(profileData).filter(([_, v]) => v !== undefined)
+          );
+
+          await setDoc(doc(db, "users", cred.user.uid), cleanProfile, { merge: true });
+          setUserProfile(cleanProfile as UserProfile);
+          setRole(userRole);
+          localStorage.setItem("learning_table_role", userRole);
+          window.dispatchEvent(new Event("roleChanged"));
+          return { success: true };
+        } catch (signInErr: any) {
+          return { 
+            success: false, 
+            error: "อีเมลนี้มีอยู่ในระบบแล้ว กรุณาสลับไปที่แท็บ 'เข้าสู่ระบบ' หรือใช้อีเมลอื่น" 
+          };
+        }
+      }
+
+      return { success: false, error: formatAuthError(err) };
     }
   };
 

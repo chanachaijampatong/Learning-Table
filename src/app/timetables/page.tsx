@@ -9,7 +9,7 @@ import {
   setDoc,
   deleteDoc 
 } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
+import { db, cleanFirestoreData } from "@/lib/firebase/config";
 import { 
   Users, 
   GraduationCap, 
@@ -316,7 +316,7 @@ export default function TimetablesPage() {
     // Persist to Firestore
     try {
       const movedItem = updatedSchedules.find(s => s.id === itemA.id)!;
-      await setDoc(doc(db, "schedules", movedItem.id), movedItem);
+      await setDoc(doc(db, "schedules", movedItem.id), cleanFirestoreData(movedItem));
     } catch (err) {
       console.warn("Firestore sync skipped:", err);
     }

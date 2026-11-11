@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  X, 
-  BookOpen, 
-  Sparkles, 
-  CalendarDays, 
-  Printer, 
-  FileSpreadsheet, 
-  ShieldCheck, 
-  Lightbulb, 
-  ArrowRight, 
+import {
+  X,
+  BookOpen,
+  Sparkles,
+  CalendarDays,
+  Printer,
+  FileSpreadsheet,
+  ShieldCheck,
+  Lightbulb,
+  ArrowRight,
   CheckCircle2,
   ExternalLink
 } from "lucide-react";
@@ -109,7 +109,7 @@ export default function QuickGuideModal({ isOpen, onClose }: QuickGuideModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div 
+      <div
         className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
@@ -146,11 +146,10 @@ export default function QuickGuideModal({ isOpen, onClose }: QuickGuideModalProp
               <button
                 key={step.id}
                 onClick={() => setActiveTab(step.id)}
-                className={`py-3 px-2 flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 transition-all cursor-pointer border-r border-slate-200/60 last:border-r-0 relative ${
-                  isActive 
-                    ? "bg-white text-blue-700 font-extrabold shadow-xs" 
+                className={`py-3 px-2 flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 transition-all cursor-pointer border-r border-slate-200/60 last:border-r-0 relative ${isActive
+                    ? "bg-white text-blue-700 font-extrabold shadow-sm"
                     : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/60"
-                }`}
+                  }`}
               >
                 <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
                 <span className="truncate text-center">{step.title}</span>

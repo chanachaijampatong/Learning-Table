@@ -48,13 +48,13 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
   const pageInfo = getPageTitle();
 
   return (
-    <header className="no-print sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+    <header className="no-print sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-3 relative flex items-center justify-between min-h-[60px]">
       {/* Left: Mobile Hamburger & Page Title */}
-      <div className="flex items-center space-x-3.5">
+      <div className="flex items-center space-x-3.5 z-10">
         {/* Mobile Sidebar Toggle Button */}
         <button
           onClick={onToggleSidebar}
-          className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors"
+          className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
           aria-label="เปิดเมนูนำทาง"
         >
           <Menu className="w-5 h-5" />
@@ -73,36 +73,49 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
         </div>
       </div>
 
-      {/* Right: Quick Guide & Active Role Pill */}
-      <div className="flex items-center space-x-2.5">
-        {/* Quick Guide Pill Button */}
+      {/* Center: Quick Guide Button (Absolute Centered on screen for sm+) */}
+      <div className="hidden sm:flex absolute left-1/2 -translate-x-1/2 items-center justify-center z-10">
         <button
           type="button"
           onClick={() => setGuideOpen(true)}
-          className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100/90 text-amber-900 border border-amber-200 text-xs font-bold transition-all shadow-sm cursor-pointer"
+          className="h-9 inline-flex items-center space-x-2 px-4 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-900 border border-amber-200 text-xs font-bold transition-all shadow-sm cursor-pointer hover:scale-105 active:scale-95"
         >
-          <Lightbulb className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <span className="hidden sm:inline">คู่มือ Quick Guide</span>
-          <span className="sm:hidden">คู่มือ</span>
+          <Lightbulb className="w-4 h-4 text-amber-600 shrink-0" />
+          <span>คู่มือการใช้งาน (Quick Guide)</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-amber-200 text-[10px] text-amber-900 font-extrabold shrink-0">4 ขั้นตอน</span>
+        </button>
+      </div>
+
+      {/* Right: Quick Guide Mobile Icon + Active Role Pill */}
+      <div className="flex items-center space-x-2 z-10">
+        {/* Mobile-only Quick Guide Icon Button */}
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          className="sm:hidden h-9 w-9 inline-flex items-center justify-center rounded-full bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition-all shadow-sm cursor-pointer"
+          title="คู่มือการใช้งาน Quick Guide"
+        >
+          <Lightbulb className="w-4 h-4 text-amber-600 shrink-0" />
         </button>
 
-        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
+        {/* Active Role Pill with exact h-9 matching height */}
+        <div className="h-9 flex items-center space-x-2 px-3.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
           {role === "ADMIN" && (
             <>
-              <ShieldCheck className="w-4 h-4 text-blue-600" />
-              <span>สิทธิ์: <strong className="text-blue-700">งานวิชาการ (Admin)</strong></span>
+              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>สิทธิ์: <strong className="text-blue-700 font-bold">งานวิชาการ (Admin)</strong></span>
             </>
           )}
           {role === "TEACHER" && (
             <>
-              <UserCheck className="w-4 h-4 text-emerald-600" />
-              <span>สิทธิ์: <strong className="text-emerald-700">ครูผู้สอน</strong></span>
+              <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>สิทธิ์: <strong className="text-emerald-700 font-bold">ครูผู้สอน</strong></span>
             </>
           )}
           {role === "STUDENT" && (
             <>
-              <GraduationCap className="w-4 h-4 text-indigo-600" />
-              <span>สิทธิ์: <strong className="text-indigo-700">นักศึกษา</strong></span>
+              <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+              <span>สิทธิ์: <strong className="text-indigo-700 font-bold">นักศึกษา</strong></span>
             </>
           )}
         </div>

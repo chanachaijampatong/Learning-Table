@@ -13,7 +13,7 @@ import {
   getDoc, 
   setDoc 
 } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase/config";
+import { auth, db, cleanFirestoreData } from "@/lib/firebase/config";
 import { UserProfile, UserRole } from "@/types/database";
 
 // Format friendly Thai error messages from Firebase Auth / Firestore
@@ -167,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
-        await setDoc(doc(db, "users", cred.user.uid), fallbackProfile, { merge: true });
+        await setDoc(doc(db, "users", cred.user.uid), cleanFirestoreData(fallbackProfile), { merge: true });
         setUserProfile(fallbackProfile);
         setRole(savedRole);
       }
@@ -207,9 +207,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Ensure no undefined values are sent to Firestore
-      const cleanProfile = Object.fromEntries(
-        Object.entries(profileData).filter(([_, v]) => v !== undefined)
-      );
+      const cleanProfile = cleanFirestoreData(profileData);
 
       await setDoc(doc(db, "users", cred.user.uid), cleanProfile, { merge: true });
       setUserProfile(cleanProfile as UserProfile);
@@ -238,9 +236,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userRole === "TEACHER" && linkedId) profileData.linkedTeacherId = linkedId;
           if (userRole === "STUDENT" && linkedId) profileData.linkedGroupId = linkedId;
 
-          const cleanProfile = Object.fromEntries(
-            Object.entries(profileData).filter(([_, v]) => v !== undefined)
-          );
+          const cleanProfile = cleanFirestoreData(profileData);
 
           await setDoc(doc(db, "users", cred.user.uid), cleanProfile, { merge: true });
           setUserProfile(cleanProfile as UserProfile);

@@ -11,7 +11,7 @@ import {
   setDoc,
   writeBatch
 } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
+import { db, cleanFirestoreData } from "@/lib/firebase/config";
 import { 
   BookOpen, 
   Users, 
@@ -348,7 +348,7 @@ export default function ManagementPage() {
     };
 
     try {
-      await setDoc(doc(db, "subjects", newSub.id), newSub);
+      await setDoc(doc(db, "subjects", newSub.id), cleanFirestoreData(newSub));
       setSubjects([...subjects, newSub]);
       showToast("เพิ่มรายวิชาสำเร็จ!");
     } catch (e: any) {

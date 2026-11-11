@@ -257,7 +257,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
         {/* Bottom User Profile & Role Switcher */}
         <div className="p-4 border-t border-slate-200/80 bg-slate-50/70 space-y-3">
           {/* Active Profile Info & Logout */}
-          <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-2xs">
+          <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-sm">
             <div className="flex items-center space-x-2.5 truncate">
               <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">
                 {role === "ADMIN" ? "AD" : role === "TEACHER" ? "TC" : "ST"}

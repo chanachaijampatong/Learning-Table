@@ -596,7 +596,7 @@ export default function TimetablesPage() {
                       >
                         {item ? (
                           <div
-                            className="h-full p-2 rounded-xl text-left flex flex-col justify-between shadow-xs border transition-transform hover:scale-[1.02]"
+                            className="h-full p-2 rounded-xl text-left flex flex-col justify-between shadow-sm border transition-transform hover:scale-[1.02]"
                             style={{
                               backgroundColor: `${item.colorHex}12`,
                               borderColor: `${item.colorHex}40`,

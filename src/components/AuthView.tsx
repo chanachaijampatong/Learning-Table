@@ -215,7 +215,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
         ========================================================================
       */}
       <div 
-        className="w-full lg:w-[50%] bg-[#0d59b8] text-white p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden shrink-0"
+        className="w-full lg:w-1/2 bg-[#0d59b8] text-white p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden shrink-0"
         style={{
           backgroundImage: `
             linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
@@ -241,7 +241,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
           </Link>
 
           {/* Status Pill */}
-          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-900/60 border border-white/20 text-xs font-medium text-white backdrop-blur-xs">
+          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-900/60 border border-white/20 text-xs font-medium text-white backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>ระบบพร้อมใช้งาน</span>
           </div>
@@ -267,7 +267,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
 
           {/* 4 Feature Cards */}
           <div className="space-y-2.5 pt-2">
-            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-xs">
+            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-sm">
               <div className="p-2 rounded-xl bg-white/10 text-white shrink-0 mt-0.5">
                 <Cpu className="w-4 h-4 text-blue-200" />
               </div>
@@ -281,7 +281,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-xs">
+            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-sm">
               <div className="p-2 rounded-xl bg-white/10 text-white shrink-0 mt-0.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-300" />
               </div>
@@ -295,7 +295,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-xs">
+            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-sm">
               <div className="p-2 rounded-xl bg-white/10 text-white shrink-0 mt-0.5">
                 <CalendarDays className="w-4 h-4 text-amber-300" />
               </div>
@@ -309,7 +309,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-xs">
+            <div className="flex items-start space-x-3 p-3 rounded-2xl bg-blue-900/35 border border-white/10 backdrop-blur-sm">
               <div className="p-2 rounded-xl bg-white/10 text-white shrink-0 mt-0.5">
                 <FileSpreadsheet className="w-4 h-4 text-blue-300" />
               </div>
@@ -339,16 +339,16 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
         RIGHT SIDE: CLEAN AUTH CARD (LOGIN & REGISTER TABS)
         ========================================================================
       */}
-      <div className="w-full lg:w-[50%] bg-slate-50/70 p-6 sm:p-10 lg:p-12 flex flex-col justify-center items-center overflow-y-auto">
+      <div className="w-full lg:w-1/2 bg-slate-50/70 p-6 sm:p-10 lg:p-12 flex flex-col justify-center items-center overflow-y-auto">
         <div className="w-full max-w-md space-y-4 my-auto">
           {/* Top Auth Mode Toggle Pill */}
-          <div className="bg-white p-1 rounded-2xl border border-slate-200 shadow-xs flex">
+          <div className="bg-white p-1 rounded-2xl border border-slate-200 shadow-sm flex">
             <button
               type="button"
               onClick={() => setAuthMode("cloud")}
               className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
                 authMode === "cloud"
-                  ? "bg-blue-600 text-white shadow-xs"
+                  ? "bg-blue-600 text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -359,7 +359,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
               onClick={() => setAuthMode("demo")}
               className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
                 authMode === "demo"
-                  ? "bg-blue-600 text-white shadow-xs"
+                  ? "bg-blue-600 text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -377,21 +377,21 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
                 <button
                   type="button"
                   onClick={() => handleDemoPrefill("admin")}
-                  className="py-1.5 px-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 font-bold rounded-xl border border-blue-200 shadow-2xs transition-all text-center cursor-pointer"
+                  className="py-1.5 px-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 font-bold rounded-xl border border-blue-200 shadow-sm transition-all text-center cursor-pointer"
                 >
                   วิชาการ (Admin)
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDemoPrefill("teacher")}
-                  className="py-1.5 px-2 bg-white hover:bg-emerald-600 hover:text-white text-slate-700 font-bold rounded-xl border border-emerald-200 shadow-2xs transition-all text-center cursor-pointer"
+                  className="py-1.5 px-2 bg-white hover:bg-emerald-600 hover:text-white text-slate-700 font-bold rounded-xl border border-emerald-200 shadow-sm transition-all text-center cursor-pointer"
                 >
                   ครูผู้สอน
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDemoPrefill("student")}
-                  className="py-1.5 px-2 bg-white hover:bg-indigo-600 hover:text-white text-slate-700 font-bold rounded-xl border border-indigo-200 shadow-2xs transition-all text-center cursor-pointer"
+                  className="py-1.5 px-2 bg-white hover:bg-indigo-600 hover:text-white text-slate-700 font-bold rounded-xl border border-indigo-200 shadow-sm transition-all text-center cursor-pointer"
                 >
                   นักศึกษา
                 </button>

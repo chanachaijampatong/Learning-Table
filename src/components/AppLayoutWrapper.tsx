@@ -32,7 +32,7 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
       {/* Main Content Area (offset by sidebar width on desktop) */}
-      <div className="flex-1 flex flex-col min-w-0 lg:ml-64 sm:lg:ml-72 transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-72 transition-all duration-300">
         {/* Top Minimalist Header */}
         <TopHeader onToggleSidebar={() => setMobileOpen(!mobileOpen)} />
 

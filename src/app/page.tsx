@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   collection, 
   getDocs, 
@@ -9,6 +10,7 @@ import {
   where 
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
+import { useAuth } from "@/context/AuthContext";
 import { 
   CalendarDays, 
   Users, 
@@ -27,11 +29,14 @@ import {
   initialSubjects, 
   initialTeachers, 
   initialClassrooms, 
-  initialStudentGroups,
+  initialStudentGroups, 
   initialCourseEnrollments 
 } from "@/lib/firebase/mockData";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { currentUser, role, userProfile, loading: authLoading } = useAuth();
+
   const [stats, setStats] = useState({
     terms: 1,
     subjects: 0,
@@ -42,6 +47,28 @@ export default function DashboardPage() {
     schedules: 0,
   });
   const [loading, setLoading] = useState(true);
+
+  // Authentication Guard:
+  // When visiting localhost:3000 directly, redirect to /login immediately if not authenticated
+  useEffect(() => {
+    if (!authLoading) {
+      const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
+      const isAuthenticated = Boolean(currentUser) || hasLocalRole;
+
+      if (!isAuthenticated) {
+        router.replace("/login");
+        return;
+      }
+
+      // If logged in as student or teacher, navigate to their dedicated view
+      const activeRole = userProfile?.role || role;
+      if (activeRole === "STUDENT") {
+        router.replace("/timetables");
+      } else if (activeRole === "TEACHER") {
+        router.replace("/official-timetable");
+      }
+    }
+  }, [authLoading, currentUser, role, userProfile, router]);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -87,6 +114,19 @@ export default function DashboardPage() {
     window.addEventListener("dataSeeded", handleSeeded);
     return () => window.removeEventListener("dataSeeded", handleSeeded);
   }, []);
+
+  // If checking authentication or unauthenticated, show elegant loading screen without dashboard flicker
+  const hasLocalRole = typeof window !== "undefined" && Boolean(localStorage.getItem("learning_table_role"));
+  const isAuth = Boolean(currentUser) || hasLocalRole;
+
+  if (authLoading || !isAuth) {
+    return (
+      <div className="w-full min-h-[70vh] flex flex-col items-center justify-center space-y-3">
+        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-medium text-slate-500">กำลังเข้าสู่หน้าเข้าสู่ระบบ...</p>
+      </div>
+    );
+  }
 
   const statCards = [
     { label: "รายวิชาในหลักสูตร", count: stats.subjects, icon: BookOpen, color: "text-blue-600", bg: "bg-blue-50" },
@@ -229,4 +269,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

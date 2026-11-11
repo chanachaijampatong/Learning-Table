@@ -3,6 +3,12 @@
 
 ---
 
+## 🖼️ ภาพผังงานสถาปัตยกรรมระบบ (System Architecture & Workflow Infographic)
+
+![Learning-Table System Architecture & Workflow](/docs/system-flowchart.jpg)
+
+---
+
 ## 1. ผังงานภาพรวมการทำงานของระบบ (Overall System Flow)
 
 ```mermaid

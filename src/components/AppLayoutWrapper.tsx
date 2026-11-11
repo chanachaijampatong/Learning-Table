@@ -13,7 +13,7 @@ interface AppLayoutWrapperProps {
 export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentUser, loading: authLoading } = useAuth();
+  const { currentUser, role, userProfile, loading: authLoading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // If on authentication pages (login / register), render full screen without Sidebar or TopHeader
@@ -27,9 +27,16 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
 
       if (!isAuthenticated) {
         router.replace("/login");
+        return;
+      }
+
+      // Role permission guard: Students cannot access management or scheduler
+      const activeRole = userProfile?.role || role;
+      if (activeRole === "STUDENT" && (pathname === "/management" || pathname === "/scheduler")) {
+        router.replace("/timetables");
       }
     }
-  }, [isAuthPage, authLoading, currentUser, router]);
+  }, [isAuthPage, authLoading, currentUser, role, userProfile, pathname, router]);
 
   if (isAuthPage) {
     return (

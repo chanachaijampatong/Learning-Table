@@ -559,26 +559,26 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
                       เลือกบทบาทของคุณในสถานศึกษา <span className="text-red-500">*</span>
                     </label>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2.5">
                       {/* ครูผู้สอน (TEACHER) */}
                       <button
                         type="button"
                         onClick={() => setSelectedRole("TEACHER")}
-                        className={`relative p-2.5 sm:p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center cursor-pointer ${
+                        className={`relative p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center cursor-pointer ${
                           selectedRole === "TEACHER"
                             ? "border-emerald-500 bg-emerald-50 text-emerald-900 shadow-sm ring-2 ring-emerald-500/20"
                             : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1.5 transition-colors ${
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-1.5 transition-colors ${
                           selectedRole === "TEACHER" ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-500"
                         }`}>
-                          <UserCheck className="w-4 h-4" />
+                          <UserCheck className="w-5 h-5" />
                         </div>
                         <span className="text-xs font-extrabold leading-tight">ครูผู้สอน</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">ดูตาราง/พิมพ์ A4</span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">ดูตารางสอน / พิมพ์ A4</span>
                         {selectedRole === "TEACHER" && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500" />
+                          <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
                         )}
                       </button>
 
@@ -586,43 +586,21 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
                       <button
                         type="button"
                         onClick={() => setSelectedRole("STUDENT")}
-                        className={`relative p-2.5 sm:p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center cursor-pointer ${
+                        className={`relative p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center cursor-pointer ${
                           selectedRole === "STUDENT"
                             ? "border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-2 ring-indigo-500/20"
                             : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1.5 transition-colors ${
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-1.5 transition-colors ${
                           selectedRole === "STUDENT" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500"
                         }`}>
-                          <GraduationCap className="w-4 h-4" />
+                          <GraduationCap className="w-5 h-5" />
                         </div>
                         <span className="text-xs font-extrabold leading-tight">นักศึกษา</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">ตารางเรียนห้อง</span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">ตารางเรียนประจำห้อง</span>
                         {selectedRole === "STUDENT" && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-500" />
-                        )}
-                      </button>
-
-                      {/* งานวิชาการ (ADMIN) */}
-                      <button
-                        type="button"
-                        onClick={() => setSelectedRole("ADMIN")}
-                        className={`relative p-2.5 sm:p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center text-center cursor-pointer ${
-                          selectedRole === "ADMIN"
-                            ? "border-blue-600 bg-blue-50 text-blue-900 shadow-sm ring-2 ring-blue-500/20"
-                            : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1.5 transition-colors ${
-                          selectedRole === "ADMIN" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"
-                        }`}>
-                          <ShieldCheck className="w-4 h-4" />
-                        </div>
-                        <span className="text-xs font-extrabold leading-tight">งานวิชาการ</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">สิทธิ์เต็ม/รัน AI</span>
-                        {selectedRole === "ADMIN" && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600" />
+                          <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-indigo-500 ring-2 ring-white" />
                         )}
                       </button>
                     </div>
@@ -642,9 +620,7 @@ export default function AuthView({ initialTab = "login" }: AuthViewProps) {
                         placeholder={
                           selectedRole === "TEACHER"
                             ? "เช่น อ.สมชาย ใจดี"
-                            : selectedRole === "STUDENT"
-                            ? "เช่น นายสมศักดิ์ สุขใจ"
-                            : "เช่น เจ้าหน้าที่งานวิชาการ"
+                            : "เช่น นายสมศักดิ์ สุขใจ"
                         }
                         required
                         className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-900"

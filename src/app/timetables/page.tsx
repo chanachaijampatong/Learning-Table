@@ -42,10 +42,14 @@ import {
 import { ScheduleSolver } from "@/lib/scheduler/solver";
 import { validateSwap, validateCandidatePlacement } from "@/lib/scheduler/conflict";
 import ConflictModal from "@/components/ConflictModal";
+import { useAuth } from "@/context/AuthContext";
 
 type TimetableViewMode = "GROUP" | "TEACHER" | "CLASSROOM" | "SUBJECT";
 
 export default function TimetablesPage() {
+  const { role, userProfile } = useAuth();
+  const isStudent = role === "STUDENT";
+
   const [viewMode, setViewMode] = useState<TimetableViewMode>("GROUP");
   const [termId] = useState("2569-1");
 
@@ -173,6 +177,12 @@ export default function TimetablesPage() {
 
   // Handle cell click (Interactive Swap / Move)
   const handleCellClick = async (day: number, period: number, itemAtCell: ScheduleItem | undefined) => {
+    // If student, strictly disable editing and swapping
+    if (isStudent) {
+      showToast("🔒 โหมดนักศึกษา: ดูตารางเรียนอย่างเดียว (ไม่อนุญาตให้แก้ไขหรือสลับคาบเรียน)");
+      return;
+    }
+
     // 1. If clicking on lunch break, show warning
     if (period === 5) {
       setConflictReason("คาบที่ 5 เป็นเวลาพักรับประทานอาหารกลางวัน (12:30 - 13:30) ไม่อนุญาตให้จัดวิชาลง");
@@ -338,6 +348,14 @@ export default function TimetablesPage() {
           </p>
         </div>
 
+        {/* Student Read-Only Badge */}
+        {isStudent && (
+          <div className="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold shadow-sm">
+            <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+            <span>โหมดนักศึกษา: ดูตารางเรียนประจำห้อง (อ่านอย่างเดียว)</span>
+          </div>
+        )}
+
         {/* View Mode Tabs */}
         <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
           <button
@@ -492,7 +510,7 @@ export default function TimetablesPage() {
               <div
                 key={p.period}
                 onClick={() => handleCellClick(activeMobileDay, p.period, item)}
-                className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                className={`p-3.5 rounded-2xl border transition-all ${isStudent ? "cursor-default" : "cursor-pointer"} ${
                   item
                     ? selectedItemForSwap?.id === item.id
                       ? "bg-blue-100 border-blue-500 ring-2 ring-blue-500 shadow-md"
@@ -586,7 +604,7 @@ export default function TimetablesPage() {
                       <td
                         key={p.period}
                         onClick={() => handleCellClick(d.day, p.period, item)}
-                        className={`py-2 px-1 border-r border-slate-200 transition-all cursor-pointer align-top h-24 ${
+                        className={`py-2 px-1 border-r border-slate-200 transition-all align-top h-24 ${isStudent ? "cursor-default" : "cursor-pointer"} ${
                           isSelected
                             ? "bg-blue-100 ring-2 ring-blue-500 shadow-inner"
                             : item
@@ -596,7 +614,7 @@ export default function TimetablesPage() {
                       >
                         {item ? (
                           <div
-                            className="h-full p-2 rounded-xl text-left flex flex-col justify-between shadow-sm border transition-transform hover:scale-[1.02]"
+                            className={`h-full p-2 rounded-xl text-left flex flex-col justify-between shadow-sm border transition-transform ${isStudent ? "" : "hover:scale-[1.02]"}`}
                             style={{
                               backgroundColor: `${item.colorHex}12`,
                               borderColor: `${item.colorHex}40`,

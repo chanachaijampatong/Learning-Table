@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -8,9 +8,11 @@ import {
   ShieldCheck,
   UserCheck,
   GraduationCap,
-  LogIn
+  LogIn,
+  Lightbulb
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import QuickGuideModal from "@/components/QuickGuideModal";
 
 interface TopHeaderProps {
   onToggleSidebar: () => void;
@@ -19,6 +21,7 @@ interface TopHeaderProps {
 export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
   const pathname = usePathname();
   const { role, userProfile } = useAuth();
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // Determine current page title
   const getPageTitle = () => {
@@ -70,8 +73,19 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
         </div>
       </div>
 
-      {/* Right: Active Role Pill */}
-      <div className="flex items-center space-x-3">
+      {/* Right: Quick Guide & Active Role Pill */}
+      <div className="flex items-center space-x-2.5">
+        {/* Quick Guide Pill Button */}
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100/90 text-amber-900 border border-amber-200 text-xs font-bold transition-all shadow-sm cursor-pointer"
+        >
+          <Lightbulb className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+          <span className="hidden sm:inline">คู่มือ Quick Guide</span>
+          <span className="sm:hidden">คู่มือ</span>
+        </button>
+
         <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
           {role === "ADMIN" && (
             <>
@@ -93,6 +107,9 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
           )}
         </div>
       </div>
+
+      {/* Quick Guide Modal */}
+      <QuickGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
     </header>
   );
 }

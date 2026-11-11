@@ -18,8 +18,10 @@ import {
   LogIn,
   ChevronRight,
   User,
+  Lightbulb,
   X
 } from "lucide-react";
+import QuickGuideModal from "@/components/QuickGuideModal";
 import { seedDemoData, isDatabaseSeeded } from "@/lib/firebase/seed";
 import { UserRole } from "@/types/database";
 import { useAuth } from "@/context/AuthContext";
@@ -37,6 +39,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
   const [seeding, setSeeding] = useState(false);
   const [seedMessage, setSeedMessage] = useState<string | null>(null);
   const [hasData, setHasData] = useState<boolean | null>(null);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   useEffect(() => {
     checkStatus();
@@ -221,6 +224,24 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
               })}
           </div>
 
+          {/* Quick Guide Trigger Button */}
+          <div className="px-5 pt-3">
+            <button
+              type="button"
+              onClick={() => {
+                setGuideOpen(true);
+                setMobileOpen(false);
+              }}
+              className="w-full py-2.5 px-3 rounded-2xl bg-amber-50 hover:bg-amber-100/90 text-amber-900 border border-amber-200 text-xs font-bold flex items-center justify-between transition-all shadow-sm cursor-pointer hover:scale-[1.01]"
+            >
+              <span className="flex items-center space-x-2">
+                <Lightbulb className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>คู่มือการใช้งาน (Quick Guide)</span>
+              </span>
+              <span className="px-1.5 py-0.5 rounded-full bg-amber-200 text-[10px] text-amber-900 font-extrabold shrink-0">4 ขั้นตอน</span>
+            </button>
+          </div>
+
           {/* Quick Database Seed Section */}
           <div className="px-5 py-3 mt-auto">
             <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200/80 space-y-2">
@@ -338,6 +359,9 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
           </div>
         )}
       </aside>
+
+      {/* Quick Guide Modal */}
+      <QuickGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
     </>
   );
 }

@@ -37,6 +37,8 @@ import {
   RoomType,
   ROOM_TYPE_NAMES 
 } from "@/types/database";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 import { 
   initialSubjects, 
   initialTeachers, 
@@ -49,6 +51,7 @@ import * as XLSX from "xlsx";
 type TabType = "subjects" | "teachers" | "classrooms" | "groups" | "enrollments";
 
 export default function ManagementPage() {
+  const { role } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>("subjects");
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -372,6 +375,25 @@ export default function ManagementPage() {
     { key: "enrollments", label: "แผนการเรียน (Course Enrollments)", icon: Layers, count: enrollments.length },
   ];
 
+  if (role !== "ADMIN") {
+    return (
+      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center max-w-lg mx-auto my-12 space-y-4">
+        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+          <AlertCircle className="w-7 h-7" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">พื้นที่เฉพาะฝ่ายวิชาการ (Admin Only)</h2>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          หน้านี้สงวนสิทธิ์เฉพาะผู้ดูแลระบบและฝ่ายวิชาการเท่านั้นในการจัดการข้อมูลหลักสูตรและครูผู้สอน
+        </p>
+        <div className="pt-2 flex justify-center space-x-3">
+          <Link href="/timetables" className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">
+            เปิดดูตารางเรียน
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Toast */}
@@ -447,7 +469,26 @@ export default function ManagementPage() {
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
-          return (
+          if (role !== "ADMIN") {
+    return (
+      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center max-w-lg mx-auto my-12 space-y-4">
+        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+          <AlertCircle className="w-7 h-7" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">พื้นที่เฉพาะฝ่ายวิชาการ (Admin Only)</h2>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          หน้านี้สงวนสิทธิ์เฉพาะผู้ดูแลระบบและฝ่ายวิชาการเท่านั้นในการจัดการข้อมูลหลักสูตรและครูผู้สอน
+        </p>
+        <div className="pt-2 flex justify-center space-x-3">
+          <Link href="/timetables" className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all">
+            เปิดดูตารางเรียน
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
             <button
               key={tab.key}
               onClick={() => {

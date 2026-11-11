@@ -18,8 +18,8 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
 
   if (isAuthPage) {
     return (
-      <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <main className="w-full max-w-full">
+      <div className="min-h-screen w-full bg-white p-0 m-0">
+        <main className="w-full min-h-screen">
           {children}
         </main>
       </div>

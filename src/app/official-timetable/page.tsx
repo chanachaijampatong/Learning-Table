@@ -33,9 +33,11 @@ import {
 } from "@/lib/firebase/mockData";
 import { ScheduleSolver } from "@/lib/scheduler/solver";
 import { initialCourseEnrollments, initialClassrooms, initialStudentGroups } from "@/lib/firebase/mockData";
+import { useAuth } from "@/context/AuthContext";
 import * as XLSX from "xlsx";
 
 export default function OfficialTimetablePage() {
+  const { role, userProfile } = useAuth();
   const [teachers, setTeachers] = useState<Teacher[]>(initialTeachers);
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>("TCH_PARINYA");
   const [subjects, setSubjects] = useState<Subject[]>(initialSubjects);
@@ -44,6 +46,13 @@ export default function OfficialTimetablePage() {
   const [loading, setLoading] = useState(false);
 
   const printAreaRef = useRef<HTMLDivElement>(null);
+
+  // Sync teacher ID with logged in profile
+  useEffect(() => {
+    if (role === "TEACHER" && userProfile?.linkedTeacherId) {
+      setSelectedTeacherId(userProfile.linkedTeacherId);
+    }
+  }, [role, userProfile]);
 
   // Load data
   useEffect(() => {

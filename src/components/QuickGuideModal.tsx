@@ -223,3 +223,4 @@ export default function QuickGuideModal({ isOpen, onClose }: QuickGuideModalProp
     </div>
   );
 }
+

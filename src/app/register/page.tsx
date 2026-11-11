@@ -85,7 +85,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto my-6 space-y-6 animate-fadeIn">
+    <div className="w-full max-w-xl mx-auto my-auto animate-fadeIn">
       {/* Brand Header */}
       <div className="text-center space-y-2">
         <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
@@ -303,3 +303,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

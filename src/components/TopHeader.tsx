@@ -3,10 +3,10 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { 
-  Menu, 
-  ShieldCheck, 
-  UserCheck, 
+import {
+  Menu,
+  ShieldCheck,
+  UserCheck,
   GraduationCap,
   LogIn
 } from "lucide-react";

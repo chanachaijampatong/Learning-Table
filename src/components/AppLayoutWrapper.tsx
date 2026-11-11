@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import TopHeader from "@/components/TopHeader";
 
@@ -9,7 +10,21 @@ interface AppLayoutWrapperProps {
 }
 
 export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // If on authentication pages (login / register), render full screen without Sidebar or TopHeader
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <main className="w-full max-w-full">
+          {children}
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -29,4 +44,3 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     </div>
   );
 }
-

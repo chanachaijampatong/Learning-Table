@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppLayoutWrapper from "@/components/AppLayoutWrapper";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Learning-Table | ระบบจัดตารางการเรียนการสอนอัตโนมัติ",
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans">
-        <AppLayoutWrapper>
-          {children}
-        </AppLayoutWrapper>
+        <AuthProvider>
+          <AppLayoutWrapper>
+            {children}
+          </AppLayoutWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

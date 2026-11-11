@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   CalendarDays, 
   Settings, 
@@ -14,14 +14,15 @@ import {
   CheckCircle2,
   ShieldCheck,
   GraduationCap,
-  Menu,
-  X,
-  Layers,
+  LogOut,
+  LogIn,
   ChevronRight,
-  Info
+  User,
+  X
 } from "lucide-react";
 import { seedDemoData, isDatabaseSeeded } from "@/lib/firebase/seed";
 import { UserRole } from "@/types/database";
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -30,30 +31,18 @@ interface SidebarProps {
 
 export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
   const pathname = usePathname();
-  const [role, setRole] = useState<UserRole>("ADMIN");
+  const router = useRouter();
+  const { role, userProfile, quickDemoLogin, logout } = useAuth();
+
   const [seeding, setSeeding] = useState(false);
   const [seedMessage, setSeedMessage] = useState<string | null>(null);
   const [hasData, setHasData] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const savedRole = localStorage.getItem("learning_table_role") as UserRole;
-    if (savedRole) setRole(savedRole);
-
     checkStatus();
-
-    const handleRoleChanged = () => {
-      const r = localStorage.getItem("learning_table_role") as UserRole;
-      if (r) setRole(r);
-    };
     const handleDataSeeded = () => checkStatus();
-
-    window.addEventListener("roleChanged", handleRoleChanged);
     window.addEventListener("dataSeeded", handleDataSeeded);
-
-    return () => {
-      window.removeEventListener("roleChanged", handleRoleChanged);
-      window.removeEventListener("dataSeeded", handleDataSeeded);
-    };
+    return () => window.removeEventListener("dataSeeded", handleDataSeeded);
   }, []);
 
   const checkStatus = async () => {
@@ -61,10 +50,10 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
     setHasData(seeded);
   };
 
-  const handleRoleChange = (newRole: UserRole) => {
-    setRole(newRole);
-    localStorage.setItem("learning_table_role", newRole);
-    window.dispatchEvent(new Event("roleChanged"));
+  const handleRoleChange = async (newRole: UserRole) => {
+    if (newRole === "ADMIN") await quickDemoLogin("admin");
+    else if (newRole === "TEACHER") await quickDemoLogin("teacher");
+    else await quickDemoLogin("student");
   };
 
   const handleSeed = async () => {
@@ -79,6 +68,13 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
       window.dispatchEvent(new Event("dataSeeded"));
     }
     setTimeout(() => setSeedMessage(null), 4000);
+  };
+
+  const handleLogout = async () => {
+    if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+      await logout();
+      router.push("/login");
+    }
   };
 
   const navItems = [
@@ -258,52 +254,79 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
           </div>
         </div>
 
-        {/* Bottom User Role Switcher Card */}
-        <div className="p-4 border-t border-slate-200/80 bg-slate-50/70">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-            <span>บทบาทการใช้งาน (Role)</span>
-            <span className="text-[9px] font-semibold text-blue-600">Quick Switch</span>
+        {/* Bottom User Profile & Role Switcher */}
+        <div className="p-4 border-t border-slate-200/80 bg-slate-50/70 space-y-3">
+          {/* Active Profile Info & Logout */}
+          <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-2xs">
+            <div className="flex items-center space-x-2.5 truncate">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">
+                {role === "ADMIN" ? "AD" : role === "TEACHER" ? "TC" : "ST"}
+              </div>
+              <div className="truncate">
+                <div className="text-xs font-bold text-slate-800 truncate">
+                  {userProfile?.displayName || (role === "ADMIN" ? "ฝ่ายวิชาการ" : role === "TEACHER" ? "อ.ปริญญา" : "สปT.1/2")}
+                </div>
+                <div className="text-[10px] font-semibold text-slate-500">
+                  {role === "ADMIN" ? "ผู้ดูแลระบบ (Admin)" : role === "TEACHER" ? "ครูผู้สอน" : "นักศึกษา"}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              title="ออกจากระบบ (Logout)"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors shrink-0"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-            <button
-              onClick={() => handleRoleChange("ADMIN")}
-              title="สิทธิ์เต็ม: จัดการข้อมูลและรัน AI จัดตาราง"
-              className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all text-center flex flex-col items-center justify-center ${
-                role === "ADMIN"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5 mb-0.5" />
-              <span>วิชาการ</span>
-            </button>
+          {/* Quick Role Switcher */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
+              <span>สลับบทบาททดสอบ (Quick Switch)</span>
+            </div>
 
-            <button
-              onClick={() => handleRoleChange("TEACHER")}
-              title="สิทธิ์ครู: ดูตารางสอนตนเอง และพิมพ์แบบ A4"
-              className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all text-center flex flex-col items-center justify-center ${
-                role === "TEACHER"
-                  ? "bg-emerald-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              <UserCheck className="w-3.5 h-3.5 mb-0.5" />
-              <span>ครูผู้สอน</span>
-            </button>
+            <div className="grid grid-cols-3 gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+              <button
+                onClick={() => handleRoleChange("ADMIN")}
+                title="สิทธิ์เต็ม: จัดการข้อมูลและรัน AI จัดตาราง"
+                className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all text-center flex flex-col items-center justify-center ${
+                  role === "ADMIN"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 mb-0.5" />
+                <span>วิชาการ</span>
+              </button>
 
-            <button
-              onClick={() => handleRoleChange("STUDENT")}
-              title="สิทธิ์นักศึกษา: ดูตารางเรียนประจำห้อง"
-              className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all text-center flex flex-col items-center justify-center ${
-                role === "STUDENT"
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              <GraduationCap className="w-3.5 h-3.5 mb-0.5" />
-              <span>นักศึกษา</span>
-            </button>
+              <button
+                onClick={() => handleRoleChange("TEACHER")}
+                title="สิทธิ์ครู: ดูตารางสอนตนเอง และพิมพ์แบบ A4"
+                className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all text-center flex flex-col items-center justify-center ${
+                  role === "TEACHER"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5 mb-0.5" />
+                <span>ครูผู้สอน</span>
+              </button>
+
+              <button
+                onClick={() => handleRoleChange("STUDENT")}
+                title="สิทธิ์นักศึกษา: ดูตารางเรียนประจำห้อง"
+                className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition-all text-center flex flex-col items-center justify-center ${
+                  role === "STUDENT"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5 mb-0.5" />
+                <span>นักศึกษา</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -318,4 +341,3 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
     </>
   );
 }
-

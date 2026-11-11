@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { 
   Menu, 
-  CalendarDays, 
-  Bell, 
   ShieldCheck, 
   UserCheck, 
   GraduationCap,
-  Sparkles,
-  ExternalLink
+  LogIn
 } from "lucide-react";
-import { UserRole } from "@/types/database";
+import { useAuth } from "@/context/AuthContext";
 
 interface TopHeaderProps {
   onToggleSidebar: () => void;
@@ -20,20 +18,7 @@ interface TopHeaderProps {
 
 export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
   const pathname = usePathname();
-  const [role, setRole] = useState<UserRole>("ADMIN");
-
-  useEffect(() => {
-    const savedRole = localStorage.getItem("learning_table_role") as UserRole;
-    if (savedRole) setRole(savedRole);
-
-    const handleRoleChanged = () => {
-      const r = localStorage.getItem("learning_table_role") as UserRole;
-      if (r) setRole(r);
-    };
-
-    window.addEventListener("roleChanged", handleRoleChanged);
-    return () => window.removeEventListener("roleChanged", handleRoleChanged);
-  }, []);
+  const { role, userProfile } = useAuth();
 
   // Determine current page title
   const getPageTitle = () => {
@@ -50,6 +35,8 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
         return { title: "ตารางสอนทางการ สอศ. (Official A4)", subtitle: "แบบฟอร์มทางการมาตรฐานวิทยาลัยเทคนิคระยอง ขนาด A4 แนวนอน 1 หน้าเป๊ะ" };
       case "/login":
         return { title: "เข้าสู่ระบบ (Login)", subtitle: "เลือกบทบาทเพื่อเข้าใช้งานระบบ" };
+      case "/register":
+        return { title: "สมัครสมาชิกใหม่ (Register)", subtitle: "สร้างบัญชีผู้ใช้งานใหม่สำหรับสถานศึกษา" };
       default:
         return { title: "Learning-Table", subtitle: "ระบบจัดตารางการเรียนการสอนอัตโนมัติ" };
     }
@@ -109,4 +96,3 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
     </header>
   );
 }
-
